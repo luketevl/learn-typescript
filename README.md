@@ -56,6 +56,7 @@ sum('1', '2') // 12
     - function logger(): never { throw new Error("error")  }
   - object (qualquer coisa que nao eh tipo primitivo)
     - let cart: object
+  - unknown (parecido com o any), diferenca que pode ser definido depois.
 
 # Type Inference
 > Nao precisa dizer o tipo da variavel, ao passar o valor o typescript ja infere o seu tipo.
@@ -107,7 +108,91 @@ sum('1', '2') // 12
 type PlayerInfo = AccountInfo & CharInfo
 ```
 
-# Classes
+# Generics
+- Funcao pode ser definida seu tipo no momento que eh chamado.
+- Simbolos representao algo de algum **tipo**
+ - **S** => State
+ - **T** => Type
+ - **K** => Key
+ - **V** => Value
+ - **E** => Element
+- Limitar os tipos deve usar **extends**
+- Colocar um tipo padrao deve usar o **=**
+ ```js
+ function useState<S extends number | string = string>() {
+  let state: S
+ }
+ 
+ useState<String>('a');
+ ```
+
+# Mutations
+## Readonly
+- **Readonly**
+```js
+ type Todo = {
+  title?: string;
+  completed?: boolean
+ }
+ 
+ const todo: Readonly<Todo> = {
+  title: "a",
+  completed: true
+ }
+ function updateTodo(todo: Todo, fieldsToUpdate: Todo) {
+  return { ...todo, ...fieldsToUpdate }
+ }
+ 
+ const todo2: Todo = updateTodo(todo, { completed: false });
+ 
+```
+## Partial
+- Deixa propriedades opcionais em um determinado momento.
+ - **Partial**
+```js
+ type Todo = {
+  title: string;
+  completed: boolean
+ }
+ 
+ const todo: Readonly<Todo> = {
+  title: "a",
+  completed: true
+ }
+ function updateTodo(todo: Todo, fieldsToUpdate: Partial<Todo>) {
+  return { ...todo, ...fieldsToUpdate }
+ }
+ 
+ 
+ const todo2: Todo = updateTodo(todo, { completed: false });
+```
+
+## Pick
+- Pega apenas as propriedades que forem escolhidas.
+ - **Pick**
+```js
+ type Todo = {
+  title: string;
+  completed: boolean
+ }
+ 
+ type TodoPreview = Pick<Todo, "title" | "description">  
+```
+
+
+## Omit
+- Esconde apenas as propriedades que forem escolhidas.
+ - **Pick**
+```js
+ type Todo = {
+  title: string;
+  completed: boolean
+ }
+ 
+ type TodoPreview = Omit<Todo, "description">  
+```
+
+
 
 # Observacoes
 - Prametro **opcional**
@@ -119,4 +204,19 @@ type PlayerInfo = AccountInfo & CharInfo
   name: string;
   email?: string
  }
+```
+- **NAO** tem como definir **tuplas** na **interface**
+- **Interface** permite **multiplas** declaracoes e une eles.
+ 
+```js
+interface JQuery {
+ a: string;
+}
+interface JQuery {
+ b: string;
+}
+const $: JQuery = {
+ a: "bla",
+ b: "foo"
+}
 ```
