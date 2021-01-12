@@ -111,11 +111,11 @@ type PlayerInfo = AccountInfo & CharInfo
 # Generics
 - Funcao pode ser definida seu tipo no momento que eh chamado.
 - Simbolos representao algo de algum **tipo**
- - **S** => State
- - **T** => Type
- - **K** => Key
- - **V** => Value
- - **E** => Element
+  - **S** => State
+  - **T** => Type
+  - **K** => Key
+  - **V** => Value
+  - **E** => Element
 - Limitar os tipos deve usar **extends**
 - Colocar um tipo padrao deve usar o **=**
  ```js
@@ -192,6 +192,103 @@ type PlayerInfo = AccountInfo & CharInfo
  type TodoPreview = Omit<Todo, "description">  
 ```
 
+# Decorators
+- Serve para adicionar coisas novas, vigiando para alguma coisa.
+- Deve habilitar no tsconfig.json
+  - **experimentalDecorators**: true
+- Iniciado pelo **@**
+
+```js
+function Logger(prefix: string) {
+ return (target) => console.log(`${prefix} - ${target}`)
+}
+
+@Logger("awesome")
+class Foo {}
+```
+
+## Class Decorator
+- O que recebemos de um decorator de classe eh o **construtor**
+- Roda sempre quando a classe eh criada
+
+```js
+function setAPIVersion(apiVersion: string) {
+ return constructor => class extends constructor {
+   version = apiVersion
+  }
+}
+
+@setAPIVersion("1.0.0") 
+class API {}
+``` 
+
+## Property Decorator
+- Trabalha em cima de **propriedades**. Caso comum validacoes
+- Pode mudar o comportamento tambem
+```js
+function minLength(length: number){
+ return (target: any, key: string) => {
+  let val = target[key]
+  const getter = () => val;
+  const setter = (value: string) => {
+   if(value.length < length){
+    console.log('error'); 
+   } else {
+      val = value
+   }
+ }
+  Object.defineProperty(target, key, {
+   get: getter,
+   set: setter
+  }
+}
+
+class Movie {
+@minLength(5)
+ title: string
+ 
+ constructor(t: string) { 
+  this.title = t;
+ }
+}
+``` 
+
+
+## Method Decorator
+- Roda todo momento que o metodo eh chamado
+ - **target** = a funcao em si
+ - **key** = nome da funcao
+ - **descriptor** = descricao da funcao
+
+```js
+
+function delay(ms: number){
+ return (target: any, key: string, descriptor: PropertyDescription) => {
+  const originalMethod = descriptor.value;
+  descriptor.value = function(...args) { console.log(`Esperando ${ms}`) 
+   originalMethod.apply(this, args);
+   console.log(target, key, descriptor);
+   return descriptor;
+  }
+ }
+}
+
+class Greeter {
+ greeeting: string;
+ constructor(g: string) {
+  this.greeting = g;
+ }
+ 
+ @delay(1000);
+ greet() {
+  console.log(`Hello ${this.greeting}`)
+ }
+}
+
+const pessoa = new Greeter("Pessoa")
+pessoa.greet();
+
+```
 
 
 # Observacoes
