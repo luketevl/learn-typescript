@@ -182,7 +182,7 @@ type PlayerInfo = AccountInfo & CharInfo
 
 ## Omit
 - Esconde apenas as propriedades que forem escolhidas.
- - **Pick**
+ - **Omit**
 ```js
  type Todo = {
   title: string;
